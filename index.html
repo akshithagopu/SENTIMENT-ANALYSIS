@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Review Sentiment Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Amazon Review Sentiment Analysis</h2>
+        <textarea id="reviewText" placeholder="Enter Amazon review text here..."></textarea>
+        <button onclick="analyzeSentiment()">Analyze Sentiment</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function analyzeSentiment() {
+            const reviewText = document.getElementById('reviewText').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Analyzing sentiment...</p>';
+            
+            try {
+                // Load the Universal Sentence Encoder model
+                const useModel = await use.load();
+                // Embed the input text
+                const embeddings = await useModel.embed([reviewText]);
+                
+                // A simple sentiment analysis function based on the embeddings
+                const sentimentScore = embeddings.arraySync()[0].reduce((a, b) => a + b, 0);
+
+                let sentimentStr;
+                if (sentimentScore < 0) {
+                    sentimentStr = 'Positive';
+                } else {
+                    sentimentStr = 'Negative';
+                }
+
+                resultDiv.innerHTML = `<p>Sentiment: ${sentimentStr}</p><p>Score: ${sentimentScore.toFixed(2)}</p>`;
+            } catch (error) {
+                console.error('Error analyzing sentiment:', error);
+                resultDiv.innerHTML = `<p>An error occurred: ${error.message}</p>
+                                       <p>Please try again later.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
